@@ -9,7 +9,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-
 def call_openai(prompt: str):
     url = "https://api.openai.com/v1/chat/completions"
 
@@ -35,7 +34,7 @@ def call_openai(prompt: str):
 def call_gemini(prompt: str):
     start = time.perf_counter()
 
-    model = genai.GenerativeModel("gemini-1.0-pro")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     response = model.generate_content(prompt)
 
     latency = (time.perf_counter() - start) * 1000
@@ -48,3 +47,9 @@ def call_mock(prompt: str):
     response = f"Mock response for: {prompt}"
     latency = (time.perf_counter() - start) * 1000
     return response, latency
+
+MODEL_REGISTRY = {
+        "openai": call_openai,
+        "gemini": call_gemini,
+        "mock": call_mock
+    }
