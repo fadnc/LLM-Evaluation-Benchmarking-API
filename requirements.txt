@@ -1,10 +1,11 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
-pydantic
-python-dotenv
-requests
-sentence-transformers
-scikit-learn
-torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
+fastapi==0.110.0
+uvicorn==0.29.0
+sqlalchemy==2.0.29
+psycopg2-binary==2.9.9
+pydantic==2.6.4
+python-dotenv==1.0.1
+requests==2.31.0
+numpy<2
+torch==2.2.2
+sentence-transformers==2.6.1
+scikit-learn==1.4.2
