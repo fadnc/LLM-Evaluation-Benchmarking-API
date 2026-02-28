@@ -7,3 +7,4 @@ python-dotenv
 requests
 sentence-transformers
 scikit-learn
+torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
