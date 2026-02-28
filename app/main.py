@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from app.db import engine, SessionLocal
-from app.models import Evaluation
+from app.models import Base, Evaluation
 from app.schemas import EvaluationRequest, EvaluationResponse
 from app.llm_clients import call_gemini, call_mock
 from app.eval import compute_similarity
