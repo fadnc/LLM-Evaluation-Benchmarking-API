@@ -6,6 +6,6 @@ DATABASE_URL = os.getenv("DATABASE_URL",
                          "postgresql://user:password@localhost:5432/llm_eval")
 
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocomit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
