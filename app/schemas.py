@@ -8,4 +8,4 @@ class EvaluationResponse(BaseModel):
     model: str
     latency_ms: float
     similarity_score: float
-    resposen: str
+    response: str
