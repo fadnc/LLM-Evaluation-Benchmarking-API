@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Text, DateTime
 from datetime import datetime
-from .database import Base
+from app.db import Base
 
 class Evaluation(Base):
     __tablename__ = "evaluations"
