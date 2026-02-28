@@ -35,7 +35,7 @@ def call_openai(prompt: str):
 def call_gemini(prompt: str):
     start = time.perf_counter()
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-1.0-pro")
     response = model.generate_content(prompt)
 
     latency = (time.perf_counter() - start) * 1000
