@@ -18,9 +18,11 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+    
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/llm_eval
-      OPENAI_API_KEY: your_key_here
-
+      DATABASE_URL: ${DATABASE_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      
 volumes:
   postgres_data:
