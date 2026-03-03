@@ -13,7 +13,7 @@ app = FastAPI(title="LLM Evaluation Platform")
 def on_startup():
     Base.metadata.create_all(bind=engine)
 
-# Dependency: DB sessionS
+# Dependency: DB sessionSj
 def get_db():
     db = SessionLocal()
     try:
