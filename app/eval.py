@@ -4,7 +4,6 @@ import numpy as np
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-
 _model = None
 
 def get_embeddings():
@@ -13,7 +12,6 @@ def get_embeddings():
         _model =  SentenceTransformer('all-MiniLM-L6-v2')
     return _model
     
-
 def compute_similarity(prompt: str, response:str) -> float:
     model = get_embeddings()
     embeddings = model.encode([prompt, response])
