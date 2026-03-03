@@ -7,12 +7,13 @@ from .schemas import EvaluationRequest, EvaluationResponse
 from .llm_clients import MODEL_REGISTRY
 from app.eval import compute_similarity
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="LLM Evaluation Platform")
 
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
-# Dependency: DB session
+# Dependency: DB sessionS
 def get_db():
     db = SessionLocal()
     try:
