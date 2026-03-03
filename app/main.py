@@ -6,6 +6,7 @@ from .models import Base, Evaluation
 from .schemas import EvaluationRequest, EvaluationResponse
 from .llm_clients import MODEL_REGISTRY
 from app.eval import compute_similarity
+from app.cache import get_cached_response, set_cached_response
 
 app = FastAPI(title="LLM Evaluation Platform")
 
@@ -25,6 +26,10 @@ def get_db():
 @app.post("/evaluate", response_model=EvaluationResponse)
 def evaluate(request: EvaluationRequest, db: Session = Depends(get_db)):
 
+    cached = get_cached_response(request.model, request.prompt)
+    if cached:
+        return cached
+
     if request.model not in MODEL_REGISTRY:
         raise HTTPException(
             status_code=400,
@@ -38,15 +43,9 @@ def evaluate(request: EvaluationRequest, db: Session = Depends(get_db)):
             status_code=500,
             detail=f"Model inference failed: {str(e)}"
         )
-
-    try:
-        similarity = compute_similarity(request.prompt, response_text)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Evaluation failed: {str(e)}"
-        )
-
+        
+    similarity = compute_similarity(request.prompt, response_text)
+    
     db_entry = Evaluation(
         model_name=request.model,
         prompt=request.prompt,
@@ -57,13 +56,17 @@ def evaluate(request: EvaluationRequest, db: Session = Depends(get_db)):
 
     db.add(db_entry)
     db.commit()
+ 
+    response_data = {
+        "model": request.model,
+        "latency_ms": latency,
+        "similarity_score": similarity,
+        "response": response_text
+    }
+    
+    set_cached_response(request.model, request.prompt, response_data)
 
-    return EvaluationResponse(
-        model=request.model,
-        latency_ms=latency,
-        similarity_score=similarity,
-        response=response_text
-    )
+    return response_data
 
 @app.get("/stats")
 def get_stats(db: Session = Depends(get_db)):
