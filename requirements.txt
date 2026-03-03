@@ -10,3 +10,4 @@ torch==2.2.2
 sentence-transformers==2.6.1
 scikit-learn==1.4.2
 google-generativeai==0.5.4
+redis==5.0.4
