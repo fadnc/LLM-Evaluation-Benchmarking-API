@@ -7,6 +7,7 @@ from .schemas import EvaluationRequest, EvaluationResponse
 from .llm_clients import MODEL_REGISTRY
 from app.eval import compute_similarity
 from app.cache import get_cached_response, set_cached_response, get_cache_stats
+from app.schemas import BenchmarkRequest, BenchmarkResponse, BenchmarkResult
 
 app = FastAPI(title="LLM Evaluation Platform")
 
@@ -100,3 +101,39 @@ def health_check():
 @app.get("/cache/stats")
 def cache_stats():
     return get_cache_stats()
+
+@app.post("/benchmark", response_model=BenchmarkResponse)
+def benchmark(request: BenchmarkRequest):
+
+    results = []
+
+    for model_name in request.models:
+
+        if model_name not in MODEL_REGISTRY:
+            continue
+
+        try:
+            response_text, latency = MODEL_REGISTRY[model_name](request.prompt)
+
+            similarity = compute_similarity(
+                request.prompt,
+                response_text
+            )
+
+            results.append({
+                "model": model_name,
+                "latency_ms": latency,
+                "similarity_score": similarity
+            })
+
+        except Exception as e:
+            results.append({
+                "model": model_name,
+                "latency_ms": -1,
+                "similarity_score": 0
+            })
+
+    return {
+        "prompt": request.prompt,
+        "results": results
+    }
