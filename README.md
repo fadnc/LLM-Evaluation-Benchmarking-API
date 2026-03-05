@@ -251,6 +251,21 @@ requirements.txt
 
 ---
 
+Client
+  |
+  v
+FastAPI API
+  |
+  +------ Redis (Cache)
+  |
+  +------ PostgreSQL (Metrics Storage)
+  |
+  +------ LLM Providers
+            - Gemini
+            - Mock Model
+
+---
+
 ## Future Improvements
 
 The platform can be extended with additional capabilities:
