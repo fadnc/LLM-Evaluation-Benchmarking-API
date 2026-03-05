@@ -6,7 +6,7 @@ from .models import Base, Evaluation
 from .schemas import EvaluationRequest, EvaluationResponse
 from .llm_clients import MODEL_REGISTRY
 from app.eval import compute_similarity
-from app.cache import get_cached_response, set_cached_response
+from app.cache import get_cached_response, set_cached_response, get_cache_stats
 
 app = FastAPI(title="LLM Evaluation Platform")
 
@@ -93,10 +93,10 @@ def get_stats(db: Session = Depends(get_db)):
 
     return stats
 
-
-# -------------------------------
-# Health Check Endpoint
-# -------------------------------
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/cache/stats")
+def cache_stats():
+    return get_cache_stats()
