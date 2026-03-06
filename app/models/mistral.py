@@ -1,13 +1,10 @@
 import os
 import time
-from mistralai.client import MistralClient
+from mistralai import Mistral
 
 API_KEY = os.getenv("MISTRAL_API_KEY")
 
-client = None
-if API_KEY:
-    client = MistralClient(api_key=API_KEY)
-
+client = Mistral(api_key=API_KEY) if API_KEY else None
 
 def mistral_generate(prompt: str):
     if client is None:
@@ -15,8 +12,8 @@ def mistral_generate(prompt: str):
 
     start = time.time()
 
-    response = client.chat(
-        model="mistral-small",
+    response = client.chat.complete(
+        model="mistral-small-latest",
         messages=[{"role": "user", "content": prompt}]
     )
 
