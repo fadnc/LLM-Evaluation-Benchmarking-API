@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from contextlib import asynccontextmanager
 from app.db import engine, SessionLocal
 from app.models import Base, Evaluation
 from app.schemas import EvaluationRequest, EvaluationResponse
@@ -11,9 +12,12 @@ from app.schemas import BenchmarkRequest, BenchmarkResponse, BenchmarkResult
 
 app = FastAPI(title="LLM Evaluation Platform")
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    yield
+
+app = FastAPI(title="LLM Evaluation Platform", lifespan=lifespan)
 
 # Dependency: DB sessionSj
 def get_db():
