@@ -2,9 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.db import engine, SessionLocal
-from .models import Base, Evaluation
-from .schemas import EvaluationRequest, EvaluationResponse
-from .llm_clients import MODEL_REGISTRY
+from app.models import Base, Evaluation
+from app.schemas import EvaluationRequest, EvaluationResponse
+from app.models import MODEL_REGISTRY
 from app.eval import compute_similarity
 from app.cache import get_cached_response, set_cached_response, get_cache_stats
 from app.schemas import BenchmarkRequest, BenchmarkResponse, BenchmarkResult
@@ -129,8 +129,8 @@ def benchmark(request: BenchmarkRequest):
         except Exception as e:
             results.append({
                 "model": model_name,
-                "latency_ms": -1,
-                "similarity_score": 0
+                "latency_ms": -1.0,
+                "similarity_score": 0.0
             })
 
     return {
