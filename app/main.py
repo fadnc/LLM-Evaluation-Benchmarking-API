@@ -107,13 +107,20 @@ def cache_stats():
     return get_cache_stats()
 
 @app.post("/benchmark", response_model=BenchmarkResponse)
-def benchmark(request: BenchmarkRequest):
-
+def benchmark(request: BenchmarkRequest, db: Session = Depends(get_db)):
     results = []
 
     for model_name in request.models:
-
         if model_name not in MODEL_REGISTRY:
+            continue
+        
+        cached = get_cached_response(model_name, request.prompt)
+        if cached:
+            results.append({
+                "model": model_name,
+                "latency_ms": cached["latency_ms"],
+                "similarity_score": cached["similarity_score"]
+            })
             continue
 
         try:
@@ -136,7 +143,33 @@ def benchmark(request: BenchmarkRequest):
                 "latency_ms": -1.0,
                 "similarity_score": 0.0
             })
-
+            continue
+        
+        db_entry = Evaluation(
+            model_name=model_name,
+            prompt=request.prompt,
+            response=response_text,
+            latency_ms=latency,
+            similarity_score=similarity
+        )
+        db.add(db_entry)
+        db.commit()
+        
+        response_data = {
+            "model_name": model_name,
+            "latency_ms": latency,
+            "similarity_score": similarity,
+            "response": response_text
+        }
+        
+        set_cached_response(model_name, request.prompt, response_data)
+        
+        results.append({
+            "model": model_name,
+            "latency_ms": latency,
+            "similarity_score": similarity
+        })
+        
     return {
         "prompt": request.prompt,
         "results": results
