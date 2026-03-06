@@ -1,6 +1,7 @@
 import os
 import redis
 import json
+import hashlib
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
@@ -11,7 +12,8 @@ CACHE_HITS_KEY = "cache:hits"
 CACHE_MISSES_KEY = "cache:misses"
 
 def generate_cache_key(model, prompt):
-    return f"Eval:{model}:{prompt}"
+    prompt_hash = hashlib.md5(prompt.encode().hexdigest())
+    return f"eval:{model}:{prompt_hash}"
 
 def get_cached_response(model, prompt):
     key = generate_cache_key(model, prompt)
