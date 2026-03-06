@@ -20,37 +20,37 @@ MODEL_REGISTRY = {}
 try:
     from app.models.gemini import gemini_generate
     MODEL_REGISTRY["gemini"] = gemini_generate
-except ImportError:
+except Exception:
     pass
 
 try:
     from app.models.openai import openai_generate
     MODEL_REGISTRY["openai"] = openai_generate
-except ImportError:
+except Exception:
     pass
 
 try:
     from app.models.claude import claude_generate
     MODEL_REGISTRY["claude"] = claude_generate
-except ImportError:
+except Exception:
     pass
 
 try:
     from app.models.mistral import mistral_generate
     MODEL_REGISTRY["mistral"] = mistral_generate
-except ImportError:
+except Exception:
     pass
 
 try:
     from app.models.ollama import ollama_generate
     MODEL_REGISTRY["ollama"] = ollama_generate
-except ImportError:
+except Exception:
     pass
 
 try:
     from app.models.groq import groq_generate
     MODEL_REGISTRY["groq"] = groq_generate
-except ImportError:
+except Exception:
     pass
 
 # Mock should always work (no external deps)
