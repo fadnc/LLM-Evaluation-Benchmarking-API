@@ -1,4 +1,7 @@
+import os
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from contextlib import asynccontextmanager
@@ -9,27 +12,28 @@ from app.models import MODEL_REGISTRY
 from app.eval import compute_similarity
 from app.cache import get_cached_response, set_cached_response, get_cache_stats
 from app.schemas import BenchmarkRequest, BenchmarkResponse, BenchmarkResult
-
-
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="LLM Evaluation Platform")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],      # allows requests from any origin including file://
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
 
+# ← only ONE app definition
 app = FastAPI(title="LLM Evaluation Platform", lifespan=lifespan)
 
-# Dependency: DB sessionSj
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ← only ONE mount
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+
 def get_db():
     db = SessionLocal()
     try:
@@ -37,16 +41,9 @@ def get_db():
     finally:
         db.close()
 
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
 @app.get("/dashboard")
 def dashboard():
-    return FileResponse("app/static/llm-dashboard.html")
-
-from fastapi.responses import HTMLResponse
+    return FileResponse(os.path.join(BASE_DIR, "static", "llm-dashboard.html"))
 
 @app.get("/", response_class=HTMLResponse)
 def root():
