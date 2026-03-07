@@ -10,7 +10,17 @@ from app.eval import compute_similarity
 from app.cache import get_cached_response, set_cached_response, get_cache_stats
 from app.schemas import BenchmarkRequest, BenchmarkResponse, BenchmarkResult
 
+
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="LLM Evaluation Platform")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # allows requests from any origin including file://
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,7 +37,46 @@ def get_db():
     finally:
         db.close()
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse("app/static/llm-dashboard.html")
+
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return """
+    <html>
+      <head>
+        <title>LLM Eval Platform</title>
+        <style>
+          body { font-family: monospace; background: #080c10; color: #e8f4f8; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+          h1 { color: #00d4ff; font-size: 2rem; }
+          p { color: #4a6070; margin: 6px 0; }
+          a { color: #00d4ff; text-decoration: none; margin: 8px; padding: 10px 20px; border: 1px solid #00d4ff; border-radius: 6px; display: inline-block; }
+          a:hover { background: rgba(0,212,255,0.1); }
+          .links { margin-top: 24px; }
+        </style>
+      </head>
+      <body>
+        <h1>⚡ LLM Eval Platform</h1>
+        <p>API is running</p>
+        <div class="links">
+          <a href="/docs">📖 Swagger UI</a>
+          <a href="/dashboard">⚡ Dashboard</a>
+          <a href="/health">❤ Health</a>
+          <a href="/stats">📊 Stats</a>
+          <a href="/cache/stats">🗄 Cache</a>
+        </div>
+      </body>
+    </html>
+    """
+    
 @app.post("/evaluate", response_model=EvaluationResponse)
 def evaluate(request: EvaluationRequest, db: Session = Depends(get_db)):
 
