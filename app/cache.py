@@ -12,7 +12,7 @@ CACHE_HITS_KEY = "cache:hits"
 CACHE_MISSES_KEY = "cache:misses"
 
 def generate_cache_key(model, prompt):
-    prompt_hash = hashlib.md5(prompt.encode().hexdigest())
+    prompt_hash = hashlib.md5(prompt.encode()).hexdigest()
     return f"eval:{model}:{prompt_hash}"
 
 def get_cached_response(model, prompt):
