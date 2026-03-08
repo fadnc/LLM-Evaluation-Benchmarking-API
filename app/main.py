@@ -21,7 +21,6 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
 
-# ← only ONE app definition
 app = FastAPI(title="LLM Evaluation Platform", lifespan=lifespan)
 
 app.add_middleware(
@@ -31,7 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ← only ONE mount
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 def get_db():
@@ -43,7 +41,7 @@ def get_db():
 
 @app.get("/dashboard")
 def dashboard():
-    return FileResponse(os.path.join(BASE_DIR, "static", "llm-dashboard.html"))
+    return FileResponse(os.path.join(BASE_DIR, "static", "llm_dashboard.html"))
 
 @app.get("/", response_class=HTMLResponse)
 def root():
